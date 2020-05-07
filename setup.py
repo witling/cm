@@ -5,6 +5,10 @@ setup(
     version='0.0.1',
     description='a discord bot that runs quasicode',
     packages=find_packages(),
+    package_data={
+        'lang': ['*.json']
+    },
+    include_package_data=True,
     install_requires=[
         'discord.py',
         'quasicode'

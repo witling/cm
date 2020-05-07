@@ -1,0 +1,6 @@
+#!/bin/bash
+
+FPATH=$(readlink -f ./token)
+export CM_DISCORD_TOKEN_PATH=$FPATH
+
+python3 -m cm
