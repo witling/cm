@@ -10,4 +10,4 @@ class Language:
         self._inner = json.loads(data)
 
     def __getattr__(self, key):
-        return self._inner
+        return self._inner[key]
