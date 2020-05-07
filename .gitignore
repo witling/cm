@@ -1,0 +1,4 @@
+**/build/*
+**/cm.egg-info/*
+**/__pycache__/*
+token
