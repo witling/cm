@@ -53,7 +53,7 @@ class CmClient(Client):
         if message.author == self.user:
             return
 
-        parts = message.content.split(' ')
+        parts = message.content.split()
         if parts[0] in self._cmds:
             await self._cmds[parts[0]](message)
 
