@@ -39,6 +39,9 @@ class CmClient(Client):
                     return channel
         return None
 
+    def language(self):
+        return self._lang
+
     async def on_ready(self):
         if self._channel is None:
             self._channel = self.search_channel()
