@@ -11,7 +11,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'discord.py',
-        'quasicode'
+        'quasicode',
+        'mistune',
     ],
     entry_points={'console_scripts': ['cm=cm.__main__:main']}
 )
