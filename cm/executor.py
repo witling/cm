@@ -77,7 +77,10 @@ class CodeExecutor:
 
         src = CodeExecutor.extract_code(content)
         if src is None:
-            raise Exception('format was invalid')
+            raise Exception(self._client.language().invalid_message_format)
+
+        if not src:
+            raise Exception(self._client.language().no_code_to_run)
 
         stdout = io.StringIO()
         program = self._compiler.compile(src)

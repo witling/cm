@@ -1,5 +1,7 @@
 {
     "greet": "Hi, please tell me what to `quasi`!",
     "channel_topic": "This bot runs quasicode https://github.com/witling/quasicode. Just type $run and pass some valid quasicode or link to source code afterwards.\n\nFind the bots source code at https://github.com/witling/cm",
-    "buggy_code_given": "Your input was not a valid quasicode - quasi invalid."
+    "buggy_code_given": "Your input was not a valid quasicode - quasi invalid.",
+    "invalid_message_format": "The message format was invalid.",
+    "no_code_to_run": "No code to run."
 }
