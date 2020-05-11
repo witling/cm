@@ -11,9 +11,9 @@ class CmClient(Client):
 
     def __init__(self):
         super().__init__()
-        self._lang = Language('lang/default.json')
+        self._lang = Language.get()
         self._channel = None
-        self._code_executor = CodeExecutor()
+        self._code_executor = CodeExecutor(self)
 
         self._cmds = {}
         cmds = {

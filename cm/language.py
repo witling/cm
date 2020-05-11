@@ -2,6 +2,13 @@ import json
 import pkgutil
 
 class Language:
+    _instance = None
+
+    def get():
+        if Language._instance is None:
+            Language._instance = Language('lang/default.json')
+        return Language._instance
+
     def __init__(self, fpath):
         self._inner = {}
         self._fpath = fpath

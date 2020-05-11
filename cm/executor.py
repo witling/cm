@@ -29,7 +29,8 @@ class CustomRenderer(mistune.Renderer):
         return code
 
 class CodeExecutor:
-    def __init__(self):
+    def __init__(self, client):
+        self._client = client
         self._compiler = Compiler()
 
     def extract_code(content):
@@ -40,9 +41,10 @@ class CodeExecutor:
         return content
 
     async def set_message_state(self, message, state):
+        for reaction in message.reactions:
+            await reaction.remove(self._client.user)
+
         await message.add_reaction(state.value)
-        
-        # TODO: remove other reactions if there are any
 
     async def process(self, message):
         content = message.content
@@ -68,8 +70,12 @@ class CodeExecutor:
         try:
             message.content = strip_command(message.content)
             output = await self.process(message)
+
             await message.channel.send(output)
+            await self.set_message_state(message, MessageState.DONE)
 
         except Exception as e:
             msg = '{}\n{}'.format(self._lang.buggy_code_given, e)
+
             await message.channel.send(msg)
+            await self.set_message_state(message, MessageState.ERROR)
