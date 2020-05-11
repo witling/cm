@@ -71,11 +71,11 @@ class CodeExecutor:
             message.content = strip_command(message.content)
             output = await self.process(message)
 
-            await message.channel.send(output)
+            await message.channel.send('{}\n {}'.format(message.author.mention, output))
             await self.set_message_state(message, MessageState.DONE)
 
         except Exception as e:
             msg = '{}\n{}'.format(self._client.language().buggy_code_given, e)
 
-            await message.channel.send(msg)
+            await message.channel.send('{}\n {}'.format(message.author.mention, msg))
             await self.set_message_state(message, MessageState.ERROR)
