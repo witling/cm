@@ -50,8 +50,8 @@ class CmClient(Client):
 
     async def _run_code(self, message):
         try:
-            content = CmClient.strip_command(message.content)
-            output = self._code_executor.handle(content)
+            message.content = CmClient.strip_command(message.content)
+            output = await self._code_executor.handle(message)
             await message.channel.send(output)
 
         except Exception as e:

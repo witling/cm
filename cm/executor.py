@@ -1,7 +1,14 @@
+import enum
 import io
 import mistune
 
 from qclib import Compiler, Interpreter
+
+@enum.unique
+class MessageState(enum.Enum):
+    PROCESSING = '\N{CLOCK FACE ONE OCLOCK}'
+    DONE = '\N{WHITE HEAVY CHECK MARK}'
+    ERROR = '\N{CROSS MARK}'
 
 class CustomRenderer(mistune.Renderer):
     def __init__(self):
@@ -30,7 +37,16 @@ class CodeExecutor:
             return renderer.code()
         return content
 
-    def handle(self, content):
+    async def set_message_state(self, message, state):
+        await message.add_reaction(state.value)
+        
+        # TODO: remove other reactions if there are any
+
+    async def handle(self, message):
+        content = message.content
+
+        await self.set_message_state(message, MessageState.PROCESSING)
+
         src = CodeExecutor.extract_code(content)
         if src is None:
             raise Exception('format was invalid')
