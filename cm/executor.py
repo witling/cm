@@ -85,8 +85,9 @@ class CodeExecutor:
         stdout = io.StringIO()
         program = self._compiler.compile(src)
 
-        interpreter = Interpreter()
+        interpreter = Interpreter(restricted=True)
         interpreter._ctx.set_stdout(stdout)
+        interpreter._ctx.set_allowed_modules(['std', 'string'])
 
         interpreter.load(program)
         interpreter.run()
