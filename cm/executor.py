@@ -16,8 +16,18 @@ class CustomRenderer(mistune.Renderer):
     def __init__(self):
         super().__init__()
         self._code = None
+        self._link = None
+
+    def link(self, link, title, text):
+        self._link = link
+        return self._link
 
     def code(self):
+        if not self._link is None:
+            from urllib.request import urlopen
+            response = urlopen(self._link)
+            print(response.info())
+            return response.read().decode('utf-8')
         return self._code
 
     def codespan(self, code):
