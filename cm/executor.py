@@ -4,6 +4,8 @@ import mistune
 
 from qclib import Compiler, Interpreter
 
+from .util import strip_command
+
 @enum.unique
 class MessageState(enum.Enum):
     PROCESSING = '\N{CLOCK FACE ONE OCLOCK}'
@@ -42,7 +44,7 @@ class CodeExecutor:
         
         # TODO: remove other reactions if there are any
 
-    async def handle(self, message):
+    async def process(self, message):
         content = message.content
 
         await self.set_message_state(message, MessageState.PROCESSING)
@@ -61,3 +63,13 @@ class CodeExecutor:
         interpreter.run()
 
         return stdout.getvalue()
+
+    async def handle(self, message):
+        try:
+            message.content = strip_command(message.content)
+            output = await self.process(message)
+            await message.channel.send(output)
+
+        except Exception as e:
+            msg = '{}\n{}'.format(self._lang.buggy_code_given, e)
+            await message.channel.send(msg)

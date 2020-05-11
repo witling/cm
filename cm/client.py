@@ -1,5 +1,4 @@
 import os
-import re
 
 from discord import Client
 
@@ -18,7 +17,7 @@ class CmClient(Client):
 
         self._cmds = {}
         cmds = {
-            'run': self._run_code
+            'run': self._code_executor.handle
         }
 
         for cmd, callback in cmds.items():
@@ -39,24 +38,6 @@ class CmClient(Client):
                 if channel.name == 'quasicoding':
                     return channel
         return None
-
-    def strip_command(content):
-        match = re.match('^(\s*\$\S+)', content)
-        if match is None:
-            return
-
-        cut = len(match.group(1))
-        return content[cut:].strip()
-
-    async def _run_code(self, message):
-        try:
-            message.content = CmClient.strip_command(message.content)
-            output = await self._code_executor.handle(message)
-            await message.channel.send(output)
-
-        except Exception as e:
-            msg = '{}\n{}'.format(self._lang.buggy_code_given, e)
-            await message.channel.send(msg)
 
     async def on_ready(self):
         if self._channel is None:
