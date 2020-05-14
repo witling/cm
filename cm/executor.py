@@ -44,6 +44,7 @@ class CustomRenderer(mistune.Renderer):
 
 class CodeExecutor:
     RE_URL = re.compile('(www|http)\S+')
+    ERR_DIRECTORY = 'errors'
 
     def __init__(self, client):
         self._client = client
@@ -64,6 +65,20 @@ class CodeExecutor:
 
         return content
 
+    def _backup_error_src(self, src):
+        import datetime
+        import os
+
+        try:
+            os.mkdir(CodeExecutor.ERR_DIRECTORY)
+        except:
+            pass
+
+        n = datetime.datetime.now()
+        fpath = os.path.join(CodeExecutor.ERR_DIRECTORY, '{}.qc'.format(n.isoformat()))
+        with open(fpath, 'w') as fout:
+            fout.write(src)
+
     async def set_message_state(self, message, state):
         for reaction in message.reactions:
             await reaction.remove(self._client.user)
@@ -79,20 +94,25 @@ class CodeExecutor:
         if src is None:
             raise Exception(self._client.language().invalid_message_format)
 
-        if not src:
-            raise Exception(self._client.language().no_code_to_run)
+        try:
+            if not src:
+                raise Exception(self._client.language().no_code_to_run)
 
-        stdout = io.StringIO()
-        program = self._compiler.compile(src)
+            stdout = io.StringIO()
+            program = self._compiler.compile(src)
 
-        interpreter = Interpreter(restricted=True)
-        interpreter._ctx.set_stdout(stdout)
-        interpreter._ctx.set_allowed_modules(['std', 'string'])
+            interpreter = Interpreter(restricted=True)
+            interpreter._ctx.set_stdout(stdout)
+            interpreter._ctx.set_allowed_modules(['std', 'string'])
 
-        interpreter.load(program)
-        interpreter.run()
+            interpreter.load(program)
+            interpreter.run()
 
-        return stdout.getvalue()
+            return stdout.getvalue()
+
+        except Exception as e:
+            self._backup_error_src(src)
+            raise e
 
     async def handle(self, message):
         try:
