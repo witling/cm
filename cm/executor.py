@@ -88,8 +88,6 @@ class CodeExecutor:
     async def process(self, message):
         content = message.content
 
-        await self.set_message_state(message, MessageState.PROCESSING)
-
         src = CodeExecutor.extract_code(content)
         if src is None:
             raise Exception(self._client.language().invalid_message_format)
@@ -116,6 +114,8 @@ class CodeExecutor:
 
     async def handle(self, message):
         try:
+            await self.set_message_state(message, MessageState.PROCESSING)
+
             message.content = strip_command(message.content)
             output = await self.process(message)
 
