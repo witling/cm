@@ -101,7 +101,7 @@ class CodeExecutor:
 
             interpreter = Interpreter(restricted=True)
             interpreter._ctx.set_stdout(stdout)
-            interpreter._ctx.set_allowed_modules(['std', 'string'])
+            interpreter._ctx.set_blocked_modules(['net', 'io'])
 
             interpreter.load(program)
             interpreter.run()
