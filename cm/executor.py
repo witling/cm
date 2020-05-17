@@ -99,7 +99,7 @@ class CodeExecutor:
                 raise Exception(self._client.language().no_code_to_run)
 
             stdout = io.StringIO()
-            program = self._compiler.compile(src)
+            program = self._compiler.compile(src, auto_main=True)
 
             interpreter = Interpreter(restricted=True)
             interpreter._ctx.set_stdout(stdout)
