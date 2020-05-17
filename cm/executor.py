@@ -92,25 +92,24 @@ class CodeExecutor:
         if src is None:
             raise Exception(self._client.language().invalid_message_format)
 
-        try:
-            if not src:
-                raise Exception(self._client.language().no_code_to_run)
+        if not src:
+            raise Exception(self._client.language().no_code_to_run)
 
-            stdout = io.StringIO()
-            program = self._compiler.compile(src, auto_main=True)
+        stdout = io.StringIO()
+        program = self._compiler.compile(src, auto_main=True)
 
-            interpreter = Interpreter(restricted=True)
-            interpreter._ctx.set_stdout(stdout)
-            interpreter._ctx.set_blocked_modules(['net', 'io'])
+        interpreter = Interpreter(restricted=True)
+        interpreter._ctx.set_stdout(stdout)
+        interpreter._ctx.set_blocked_modules(['net', 'io'])
 
-            interpreter.load(program)
-            interpreter.run()
+        interpreter.load(program)
+        interpreter.run()
 
-            return stdout.getvalue()
-
-        except Exception as e:
+        if interpreter._ctx.last_error:
             self._backup_error_src(src)
-            raise e
+            raise interpreter._ctx.last_error
+
+        return stdout.getvalue()
 
     async def handle(self, message):
         try:
@@ -119,11 +118,11 @@ class CodeExecutor:
             message.content = strip_command(message.content)
             output = await self.process(message)
 
-            await message.channel.send('{}\n {}'.format(message.author.mention, output))
+            await message.channel.send('{}\n ```{}```'.format(message.author.mention, output))
             await self.set_message_state(message, MessageState.DONE)
 
         except Exception as e:
             msg = '{}\n{}'.format(self._client.language().buggy_code_given, e)
 
-            await message.channel.send('{}\n {}'.format(message.author.mention, msg))
+            await message.channel.send('{}\n ```{}```'.format(message.author.mention, msg))
             await self.set_message_state(message, MessageState.ERROR)
