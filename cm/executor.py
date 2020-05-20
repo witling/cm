@@ -99,6 +99,7 @@ class CodeExecutor:
         program = self._compiler.compile(src, auto_main=True)
 
         interpreter = Interpreter(restricted=True)
+        interpreter.disable_funny_mode()
         interpreter._ctx.set_stdout(stdout)
         interpreter._ctx.set_blocked_modules(['net', 'io'])
 
