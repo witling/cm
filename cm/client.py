@@ -17,7 +17,8 @@ class CmClient(Client):
 
         self._cmds = {}
         cmds = {
-            'run': self._code_executor.handle
+            'run': self._code_executor.handle,
+            'help': self._help,
         }
 
         for cmd, callback in cmds.items():
@@ -42,11 +43,19 @@ class CmClient(Client):
     def language(self):
         return self._lang
 
+    async def _help(self, message):
+        msg = '{}\n\n{}\n\n{}'.format(
+            self._lang.channel_topic,
+            self._lang.help,
+            self._lang.help_command_prefix.format(CmClient.CMD_START)
+        )
+        await message.channel.send(msg)
+
     async def on_ready(self):
         if self._channel is None:
             self._channel = self.search_channel()
-
-            await self._channel.edit(topic=self._lang.channel_topic)
+            topic = '{}\n\n'.format(self._lang.channel_topic)
+            await self._channel.edit(topic=topic)
         await self._channel.send(self._lang.greet)
 
     async def on_message(self, message):
