@@ -43,6 +43,16 @@ class CmClient(Client):
     def language(self):
         return self._lang
 
+    def extract_args(self, content):
+        args = []
+        for word in content.split(' '):
+            if word.startswith(CmClient.CMD_START):
+                continue
+            if not word.startswith('--'):
+                break
+            args.append(word)
+        return args
+
     async def _help(self, message):
         msg = '{}\n\n{}\n\n{}'.format(
             self._lang.channel_topic,

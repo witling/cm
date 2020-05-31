@@ -50,7 +50,12 @@ class CodeExecutor:
         self._client = client
         self._compiler = Compiler()
 
-    def extract_code(content):
+    def extract_code(self, content):
+        message_args = self._client.extract_args(content)
+        args = {
+            'funny_mode': '--nichluschdich' in message_args
+        }
+
         # try to interpret message as link first
         url_match = CodeExecutor.RE_URL.match(content)
         if url_match:
@@ -63,7 +68,7 @@ class CodeExecutor:
             if not renderer.code() is None:
                 return renderer.code()
 
-        return content
+        return args, content
 
     def _backup_error_src(self, src):
         import datetime
@@ -88,7 +93,7 @@ class CodeExecutor:
     async def process(self, message):
         content = message.content
 
-        src = CodeExecutor.extract_code(content)
+        args, src = self.extract_code(content)
         if src is None:
             raise Exception(self._client.language().invalid_message_format)
 
@@ -99,9 +104,11 @@ class CodeExecutor:
         program = self._compiler.compile(src, auto_main=True)
 
         interpreter = Interpreter(restricted=True)
-        interpreter.disable_funny_mode()
         interpreter._ctx.set_stdout(stdout)
         interpreter._ctx.set_blocked_modules(['net', 'io'])
+
+        if not args['funny_mode']:
+            interpreter.disable_funny_mode()
 
         interpreter.load(program)
         interpreter.run()

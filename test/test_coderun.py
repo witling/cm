@@ -4,15 +4,17 @@ from deps import *
 
 class TestCodeRun(Test):
     def test_extracting_code(self):
-        self.assertEqual('quasi "hej"', CodeExecutor.extract_code("""`quasi "hej"`"""))
+        args, src = client._code_executor.extract_code("""`quasi "hej"`""")
+        self.assertEqual('quasi "hej"', src)
 
         src = """
 ```
 use std
 ```
         """
+        args, src = client._code_executor.extract_code(src)
 
-        self.assertEqual('use std', CodeExecutor.extract_code(src))
+        self.assertEqual('use std', src)
 
     def test_extracting_link(self):
         import mistune
