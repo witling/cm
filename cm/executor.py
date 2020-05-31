@@ -46,27 +46,27 @@ class CodeExecutor:
     RE_URL = re.compile('(www|http)\S+')
     ERR_DIRECTORY = 'errors'
 
-    def __init__(self, client):
-        self._client = client
+    def __init__(self, app):
+        self._app = app
         self._compiler = Compiler()
 
     def extract_code(self, content):
-        message_args = self._client.extract_args(content)
+        message_args = self._app.extract_args(content)
         args = {
-            'funny_mode': '--nichluschdich' in message_args
+            'funny_mode': not '--nichluschdich' in message_args
         }
 
         # try to interpret message as link first
         url_match = CodeExecutor.RE_URL.match(content)
         if url_match:
             link = url_match.group(0)
-            return read_source_from_url(link)
+            return args, read_source_from_url(link)
         
         else:
             renderer = CustomRenderer()
             markdown = mistune.markdown(content, renderer=renderer)
             if not renderer.code() is None:
-                return renderer.code()
+                return args, renderer.code()
 
         return args, content
 
@@ -86,7 +86,7 @@ class CodeExecutor:
 
     async def set_message_state(self, message, state):
         for reaction in message.reactions:
-            await reaction.remove(self._client.user)
+            await reaction.remove(self._app._user)
 
         await message.add_reaction(state.value)
 
@@ -95,10 +95,10 @@ class CodeExecutor:
 
         args, src = self.extract_code(content)
         if src is None:
-            raise Exception(self._client.language().invalid_message_format)
+            raise Exception(self._app.language().invalid_message_format)
 
         if not src:
-            raise Exception(self._client.language().no_code_to_run)
+            raise Exception(self._app.language().no_code_to_run)
 
         stdout = io.StringIO()
         program = self._compiler.compile(src, auto_main=True)
@@ -130,7 +130,7 @@ class CodeExecutor:
             await self.set_message_state(message, MessageState.DONE)
 
         except Exception as e:
-            msg = '{}\n{}'.format(self._client.language().buggy_code_given, e)
+            msg = '{}\n{}'.format(self._app.language().buggy_code_given, e)
 
             await message.channel.send('{}\n ```{}```'.format(message.author.mention, msg))
             await self.set_message_state(message, MessageState.ERROR)

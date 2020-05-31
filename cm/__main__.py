@@ -1,7 +1,8 @@
+from .app import App
 from .client import CmClient
 
 def main():
-    client = CmClient()
+    client = CmClient(App())
     token = client.token()
     client.run(token)
 

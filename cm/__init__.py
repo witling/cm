@@ -1,3 +1,4 @@
+from .app import App
 from .client import CmClient
 from .executor import CodeExecutor, CustomRenderer
 from .language import Language
