@@ -130,7 +130,5 @@ class CodeExecutor:
             await self.set_message_state(message, MessageState.DONE)
 
         except Exception as e:
-            msg = '{}\n{}'.format(self._app.language().buggy_code_given, e)
-
-            await message.channel.send('{}\n ```{}```'.format(message.author.mention, msg))
+            await message.channel.send('{}\n {}\n```{}```'.format(message.author.mention, self._app.language().buggy_code_given, e))
             await self.set_message_state(message, MessageState.ERROR)
